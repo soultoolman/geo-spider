@@ -11,6 +11,7 @@ from geo_alchemy import PlatformParser, SampleParser, SeriesParser
 
 
 logger = logging.getLogger('geo-spider')
+modes = ['incremental', 'missed']
 settings = {
     'USER_AGENT': (
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit'
@@ -34,9 +35,17 @@ class PlatformItem(scrapy.Item):
     last_update_date = scrapy.Field()
     submission_date = scrapy.Field()
 
+    def __repr__(self):
+        return 'PlatformItem<%s>' % self['accession']
+
 
 class PlatformSpider(scrapy.Spider):
     name = 'platforms'
+
+    def __init__(self, mode='incremental', **kwargs):
+        assert mode in modes
+        self.mode = mode
+        super(PlatformSpider, self).__init__(**kwargs)
 
     def start_requests(self):
         url = 'https://www.ncbi.nlm.nih.gov/geo/browse/?view=platforms&display=20&zsort=date'
@@ -47,7 +56,11 @@ class PlatformSpider(scrapy.Spider):
             '//table[@id="geo_data"]/tbody/tr/td[1]/a/text()'
         ).extract():
             if accession in PlatformParser.platforms:
-                raise CloseSpider('All platforms have crawled.')
+                if self.mode == 'incremental':
+                    raise CloseSpider('All platforms have crawled.')
+                else:
+                    continue
+            logger.info('New accession found %s', accession)
             miniml_url = f'https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc={accession}&targ=self&form=xml&view=quick'
             yield scrapy.Request(miniml_url, callback=self.parse_platform)
         next_page = response.xpath('//div[@class="pager"]/span[@class="next"]/a/@href').get()
@@ -91,10 +104,14 @@ def geo_spider(debug_mode, log_file):
     help='crawled directory, a directory that contains all crawled jsonlines files.'
 )
 @click.option(
+    '-m', '--mode', default='incremental', show_default=True,
+    type=click.Choice(modes), help='crawling mode'
+)
+@click.option(
     '-o', '--outfile', required=False, show_default=True,
     default='platforms.jl', help='output jsonlines file'
 )
-def geo_spider_platforms(crawled_file, crawled_dir, outfile):
+def geo_spider_platforms(crawled_file, crawled_dir, mode, outfile):
     """
     crawl metadata of GEO platforms
     """
@@ -117,7 +134,7 @@ def geo_spider_platforms(crawled_file, crawled_dir, outfile):
         # 2. crawl new platforms
         settings['FEEDS'] = {outfile: {'format': 'jsonlines', 'encoding': 'utf-8'}}
         process = CrawlerProcess(settings)
-        process.crawl(PlatformSpider)
+        process.crawl(PlatformSpider, mode=mode)
         process.start()
     except jsonlines.jsonlines.InvalidLineError as exc:
         logging.exception(exc)

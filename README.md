@@ -6,6 +6,7 @@ crawl all GEO metadata, features:
 2. crawl samples
 3. crawl series
 4. incremental crawling
+5. missed crawling
 
 Table of Contents
 
@@ -15,12 +16,15 @@ Table of Contents
 4. [platforms](#platforms)
    - [denovo crawling](#platforms-denovo-crawling)
    - [incremental crawling](#platforms-incremental-crawling)
+   - [missed crawling](#platforms-missed-crawling)
 5. [samples](#samples)
    - [denovo crawling](#samples-denovo-crawling)
    - [incremental crawling](#samples-incremental-crawling)
+   - [missed crawling](#samples-missed-crawling)
 6. [series](#series)
    - [denovo crawling](#series-denovo-crawling)
    - [incremental crawling](#series-incremental-crawling)
+   - [missed crawling](#series-missed-crawling)
 
 ## installation
 
@@ -67,14 +71,26 @@ If you have multiple platforms jsonlines files:
 geo-spider platforms -cd platforms -o new-platforms.jl
 ```
 
+### platforms missed crawling
+
+Specify `-cf` or `-cd` like incremental crawling, add a `-m` option.
+
+```
+geo-spider platforms -cf platforms.jl -m missed -o new-platforms.jl
+```
+
 ## samples
 
 ### samples denovo crawling
 
 ### samples incremental crawling
 
-### series
+### samples missed crawling
+
+## series
 
 ### series denovo crawling
 
 ### series incremental crawling
+
+### series missed crawling

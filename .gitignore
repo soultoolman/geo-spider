@@ -5,6 +5,4 @@ geo_spider.egg-info
 build
 dist
 *.py[cod]
-platforms*.jl
-samples*.jl
-series*.jl
+*.jl
