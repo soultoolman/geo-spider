@@ -86,7 +86,6 @@ class SeriesItem(scrapy.Item):
     release_date = scrapy.Field()
     last_update_date = scrapy.Field()
     submission_date = scrapy.Field()
-    platforms = scrapy.Field()
     samples = scrapy.Field()
 
     def __repr__(self):
