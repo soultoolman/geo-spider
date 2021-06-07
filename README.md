@@ -83,14 +83,38 @@ geo-spider platforms -cf platforms.jl -m missed -o new-platforms.jl
 
 ### samples denovo crawling
 
+```
+geo-spider samples -o samples.jl
+```
+
 ### samples incremental crawling
 
+```
+geo-spider samples -pcf platforms.jl -cf samples.jl -o new-samples.jl
+```
+
 ### samples missed crawling
+
+```
+geo-spider samples -pcf platforms.jl -cf samples.jl -m missed -o new-samples.jl
+```
 
 ## series
 
 ### series denovo crawling
 
+```
+geo-spider series -o series.jl
+```
+
 ### series incremental crawling
 
+```
+geo-spider series -pcf platforms.jl -scf samples.jl -cf series.jl -o new-series.jl
+```
+
 ### series missed crawling
+
+```
+geo-spider series -pcf platforms.jl -scf samples.jl -cf series.jl -m missed -o new-series.jl
+```
